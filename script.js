@@ -251,7 +251,7 @@ btnClose.addEventListener('click', function (e) {
 //implementing request loan
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
-  const amount = +inputLoanAmount.value;
+  const amount = Math.floor(inputLoanAmount.value);
   inputLoanAmount.value = '';
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
