@@ -192,9 +192,9 @@ let currentAccount;
 
 //working with dates
 //fake always logged in
-currentAccount = account1;
-updateUI(currentAccount);
-containerApp.style.opacity = 100;
+// currentAccount = account1;
+// updateUI(currentAccount);
+// containerApp.style.opacity = 100;
 
 //for implementing login
 btnLogin.addEventListener('click', function (e) {
