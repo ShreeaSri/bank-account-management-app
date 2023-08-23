@@ -181,7 +181,7 @@ const calcDisplaySummary = function (acc) {
     acc.locale,
     acc.currency
   );
-  console.log(labelSumOut.textContent);
+  // console.log(labelSumOut.textContent);
 
   const interest = acc.movements
     .filter(mov => mov > 0)
@@ -215,9 +215,35 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
+const startLogOutTImer = function () {
+  const tick = function () {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+
+    //in each call, print the remaining time to UI
+    labelTimer.textContent = `${min}:${sec}`;
+
+    //when 0 seconds, stop timer and log out user
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+
+    //decrease 1s
+    time--;
+  };
+  //set time to 5 minutes
+  let time = 30;
+
+  //call the timer every second
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
 //Event Handler
 
-let currentAccount;
+let currentAccount, timer;
 
 //working with dates
 //fake always logged in
@@ -235,7 +261,7 @@ btnLogin.addEventListener('click', function (e) {
   currentAccount = accounts.find(
     acc => acc.username === inputLoginUsername.value
   );
-  console.log(currentAccount);
+  // console.log(currentAccount);
 
   if (currentAccount?.pin === +inputLoginPin.value) {
     //Display Ui and message
@@ -254,8 +280,8 @@ btnLogin.addEventListener('click', function (e) {
       year: 'numeric',
       // weekday: 'long',
     };
-    const locale = navigator.language;
-    console.log(locale);
+    // const locale = navigator.language;
+    // console.log(locale);
 
     labelDate.textContent = new Intl.DateTimeFormat(
       currentAccount.locale,
@@ -274,6 +300,10 @@ btnLogin.addEventListener('click', function (e) {
 
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
+
+    //timer
+    if (timer) clearInterval(timer);
+    timer = startLogOutTImer();
 
     //displaying the UI
     updateUI(currentAccount);
@@ -308,6 +338,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     //updating the UI
     updateUI(currentAccount);
+
+    //reset timer
+    clearInterval(timer);
+    timer = startLogOutTImer();
   }
 });
 
@@ -338,14 +372,20 @@ btnLoan.addEventListener('click', function (e) {
   inputLoanAmount.value = '';
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
-    //add movement
-    currentAccount.movements.push(amount);
+    setTimeout(function () {
+      //add movement
+      currentAccount.movements.push(amount);
 
-    //Add loan date
-    currentAccount.movementsDates.push(new Date().toISOString());
+      //Add loan date
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    //update UI
-    updateUI(currentAccount);
+      //update UI
+      updateUI(currentAccount);
+
+      //reset timer
+      clearInterval(timer);
+      timer = startLogOutTImer();
+    }, 2500);
   }
 });
 
